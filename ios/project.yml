@@ -1,0 +1,109 @@
+name: AIDetector
+options:
+  bundleIdPrefix: com.kukjinman.aidetector
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    API_BASE_URL: https://kukjinman.com/aidetector/
+    PUBLIC_WEBSITE_URL: https://kukjinman.com/aidetector/
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    CODE_SIGN_STYLE: Automatic
+    TARGETED_DEVICE_FAMILY: "1,2"
+
+targets:
+  AIDetector:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+      - path: Shared
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: AI 감지기
+        APIBaseURL: $(API_BASE_URL)
+        PublicWebsiteURL: $(PUBLIC_WEBSITE_URL)
+        WalletKeychainGroup: $(AppIdentifierPrefix)com.kukjinman.aidetector.wallet
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+    entitlements:
+      path: App/App.entitlements
+      properties:
+        keychain-access-groups:
+          - $(AppIdentifierPrefix)com.kukjinman.aidetector.wallet
+        com.apple.security.application-groups:
+          - group.com.kukjinman.aidetector
+    settings:
+      base:
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        PRODUCT_BUNDLE_IDENTIFIER: com.kukjinman.aidetector.app
+        INFOPLIST_KEY_UILaunchScreen_Generation: true
+    dependencies:
+      - target: AIDetectorShare
+        embed: true
+
+  AIDetectorShare:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: ShareExtension
+      - path: Shared
+    info:
+      path: ShareExtension/Info.plist
+      properties:
+        CFBundleDisplayName: AI 감지기
+        APIBaseURL: $(API_BASE_URL)
+        PublicWebsiteURL: $(PUBLIC_WEBSITE_URL)
+        WalletKeychainGroup: $(AppIdentifierPrefix)com.kukjinman.aidetector.wallet
+        NSExtension:
+          NSExtensionPrincipalClass: ShareViewController
+          NSExtensionPointIdentifier: com.apple.share-services
+          NSExtensionAttributes:
+            NSExtensionActivationRule:
+              NSExtensionActivationSupportsWebURLWithMaxCount: 1
+              NSExtensionActivationSupportsText: true
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+    entitlements:
+      path: ShareExtension/ShareExtension.entitlements
+      properties:
+        keychain-access-groups:
+          - $(AppIdentifierPrefix)com.kukjinman.aidetector.wallet
+        com.apple.security.application-groups:
+          - group.com.kukjinman.aidetector
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.kukjinman.aidetector.app.share
+        SKIP_INSTALL: true
+
+  AIDetectorTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+    dependencies:
+      - target: AIDetector
+
+schemes:
+  AIDetector:
+    build:
+      targets:
+        AIDetector: all
+        AIDetectorShare: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - AIDetectorTests

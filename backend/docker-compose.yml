@@ -1,0 +1,17 @@
+services:
+  backend:
+    image: aidetector-backend:latest
+    container_name: aidetector-backend
+    restart: unless-stopped
+    # Only bind to loopback — a reverse proxy (nginx/Caddy) on the same
+    # server should terminate the public domain's HTTPS and forward here.
+    ports:
+      - "127.0.0.1:8787:8787"
+    env_file:
+      - .env
+    volumes:
+      - billing-data:/app/data
+      - ./certs:/app/certs:ro
+
+volumes:
+  billing-data:
